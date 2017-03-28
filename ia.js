@@ -51,9 +51,7 @@ function Start()
 		vertice[i] = new Array(MAX_VERT);
 		
 		for(var j = 0; j < MAX_VERT; ++j)
-		{
-			++verticeName;
-			
+		{			
 			vertice[i][j] = {
 				pos_x: (GRAFO_OFFSET+GRAFO_SPACE*i),
 				pos_y: (GRAFO_OFFSET+GRAFO_SPACE*j),
@@ -63,6 +61,8 @@ function Start()
 				selected: false,
 				name: verticeName
 			}
+			
+			++verticeName;
 			
 			// Add element.
 			// i e j invertidos, no ideia why ¯\_(-.-)_/¯
@@ -96,7 +96,17 @@ function Update()
 {
 	if(selectedOne != -1 && selectedTwo != -1)
 	{
-		adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 1;
+		if(adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] != 0)
+			adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 0;
+		else
+		{
+			if((elements[selectedOne].index_i != elements[selectedTwo].index_i) && (elements[selectedOne].index_j != elements[selectedTwo].index_j))
+				adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 2;
+			else
+				adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 1;
+		}
+		
+		clearSelection();
 	}
 }
 
@@ -125,11 +135,7 @@ function Draw()
 		}
 	}
 	
-	drawAresta(vertice[0][0].pos_x,
-			   vertice[0][0].pos_y,
-			   vertice[1][1].pos_x,
-			   vertice[1][1].pos_y,
-			   'black');
+	checkAdjMatrix();
 }
 
 function addElement()
@@ -138,6 +144,12 @@ function addElement()
 	{
 		++verticeTotal;
 		reloadVisible();
+		
+		var sqrVertice = verticeTotal*verticeTotal;
+		var matrixSize = sqrVertice*(sqrVertice+1)/2;
+		adjMatrix = new Array(matrixSize); //N(N+1)/2
+		for(var i = 0; i < matrixSize; ++i)
+			adjMatrix[i] = 0;
 	}
 }
 
@@ -147,20 +159,35 @@ function removeElement()
 	{
 		--verticeTotal;
 		reloadVisible();
+		
+		var sqrVertice = verticeTotal*verticeTotal;
+		var matrixSize = sqrVertice*(sqrVertice+1)/2;
+		adjMatrix = new Array(matrixSize); //N(N+1)/2
+		for(var i = 0; i < matrixSize; ++i)
+			adjMatrix[i] = 0;
 	}
 }
 
 function reloadVisible()
 {
+	elements = [];
+	
 	for(var i = 0; i < MAX_VERT; ++i)
 	{
 		for(var j = 0; j < MAX_VERT; ++j)
 		{
 			vertice[i][j].visivel = false;
-			
+
 			if(i < verticeTotal && j < verticeTotal)
 			{
 				vertice[i][j].visivel = true;
+				
+				elements.push({
+						index_i: j,
+						index_j: i,
+						top: vertice[i][j].pos_x,
+						left: vertice[i][j].pos_y
+					});
 			}
 		}
 	}
@@ -199,9 +226,9 @@ function clickElement(event)
 					vertice[element.index_i][element.index_j].selected = true;
 					
 					if(selectedOne == -1)
-						selectedOne = vertice[element.index_i][element.index_j].name;
+						selectedOne = vertice[element.index_i][element.index_j].index_x + vertice[element.index_i][element.index_j].index_y*verticeTotal;
 					else
-						selectedTwo = vertice[element.index_i][element.index_j].name;
+						selectedTwo = vertice[element.index_i][element.index_j].index_x + vertice[element.index_i][element.index_j].index_y*verticeTotal;
 				}
 				
 				//alert('clicked the element: (' + element.index_i + ',' + element.index_j + ')');
@@ -232,7 +259,33 @@ function clearSelection()
 function fromMatrixToVector(i, j)
 {
    if (i <= j)
-      return i * MAX_VERT - (i - 1) * i / 2 + j - i;
+      return i * verticeTotal - (i - 1) * i / 2 + j - i;
    else
-      return j * MAX_VERT - (j - 1) * j / 2 + i - j;
+      return j * verticeTotal - (j - 1) * j / 2 + i - j;
+}
+
+function fromVectorToX(v){
+	return (v * (verticeTotal -1)) / (verticeTotal*verticeTotal-1);
+}
+
+function fromVectorToY(v){
+	return ;
+}
+
+function checkAdjMatrix()
+{
+	for(var i = 0; i < verticeTotal*verticeTotal; ++i)
+	{
+		for(var j = 0; j < verticeTotal*verticeTotal; ++j)
+		{
+			if(adjMatrix[fromMatrixToVector(i,j)] != 0)
+			{
+				drawAresta(vertice[elements[i].index_i][elements[i].index_i].pos_x,
+						   vertice[elements[i].index_i][elements[i].index_i].pos_y,
+						   vertice[elements[j].index_j][elements[j].index_j].pos_x,
+						   vertice[elements[j].index_j][elements[j].index_j].pos_y,
+						   'black');
+			}
+		}
+	}
 }
