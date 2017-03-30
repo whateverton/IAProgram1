@@ -85,6 +85,10 @@ function Start()
 	// Add event listener for `click` events.
 	canvas.addEventListener('click', clickElement, false);
 	
+	// Fix a bug
+	addElement();
+	removeElement();
+	
 	setInterval(Loop, 1000/FRAME_RATE);
 }
 
