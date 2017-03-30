@@ -98,14 +98,14 @@ function Update()
 {
 	if(selectedOne != -1 && selectedTwo != -1)
 	{
-		if(adjMatrix[fromMatrixToVector(selectedTwo,selectedOne)] != 0)
-			adjMatrix[fromMatrixToVector(selectedTwo,selectedOne)] = 0;
+		if(adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] != 0)
+			adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 0;
 		else
 		{
 			if((elements[selectedOne].index_i != elements[selectedTwo].index_i) && (elements[selectedOne].index_j != elements[selectedTwo].index_j))
-				adjMatrix[fromMatrixToVector(selectedTwo,selectedOne)] = 2;
+				adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 2;
 			else
-				adjMatrix[fromMatrixToVector(selectedTwo,selectedOne)] = 1;
+				adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 1;
 		}
 		
 		clearSelection();
@@ -243,6 +243,7 @@ function clickElement(event)
 				}
 				
 				//alert('clicked the element: (' + element.index_i + ',' + element.index_j + ')');
+				//alert('clicked the element: (' + vertice[element.index_i][element.index_j].index_x + ',' + vertice[element.index_i][element.index_j].index_y + ')');
 				voidClick = false;
 			}
 		}
@@ -313,15 +314,15 @@ function checkAdjMatrix()
   {
     if(adjMatrix[i] != 0)
 	{
-		drawAresta(vertice[elements[col].index_i][elements[col].index_j].pos_x,
-				   vertice[elements[col].index_i][elements[col].index_j].pos_y,
-				   vertice[elements[row].index_i][elements[row].index_j].pos_x,
-				   vertice[elements[row].index_i][elements[row].index_j].pos_y,
+		drawAresta(vertice[vertCol][vertRow].pos_x,
+				   vertice[vertCol][vertRow].pos_y,
+				   vertice[vertCol2][vertRow2].pos_x,
+				   vertice[vertCol2][vertRow2].pos_y,
 				   'black');
     }
     
-    if(matRow == 0)
-    {    
+    //if(matRow == 0)
+    //{    
       ++vertCol;
       if(vertCol == verticeTotal)
       {
@@ -331,10 +332,10 @@ function checkAdjMatrix()
       
       if(vertRow == verticeTotal)
         vertRow = 0;
-    }
+    //}
     
-    if(matCol == matRow)
-    {    
+    if((matCol == matRow) && (matRow != 0))
+    {
       ++vertCol2;
       if(vertCol2 == verticeTotal)
       {
