@@ -98,14 +98,18 @@ function Update()
 {
 	if(selectedOne != -1 && selectedTwo != -1)
 	{
-		if(adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] != 0)
-			adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 0;
-		else
+		if((elements[selectedOne].index_i - elements[selectedTwo].index_i) == 1 || (elements[selectedOne].index_j - elements[selectedTwo].index_j) == 1||
+		   (elements[selectedOne].index_i - elements[selectedTwo].index_i) == -1 || (elements[selectedOne].index_j - elements[selectedTwo].index_j) == -1)
 		{
-			if((elements[selectedOne].index_i != elements[selectedTwo].index_i) && (elements[selectedOne].index_j != elements[selectedTwo].index_j))
-				adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 2;
+			if(adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] != 0)
+				adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 0;
 			else
-				adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 1;
+			{
+				if((elements[selectedOne].index_i != elements[selectedTwo].index_i) && (elements[selectedOne].index_j != elements[selectedTwo].index_j))
+					adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 2;
+				else
+					adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 1;
+			}
 		}
 		
 		clearSelection();
@@ -276,14 +280,6 @@ function fromMatrixToVector(i, j)
       return j*verticeTotal+i;//return j * verticeTotal - (j - 1) * j / 2 + i - j;
 }
 
-function fromVectorToX(v){
-	return (v * (verticeTotal -1)) / (verticeTotal*verticeTotal-1);
-}
-
-function fromVectorToY(v){
-	return ;
-}
-
 function checkAdjMatrix()
 {
 	/*for(var i = 0; i < verticeTotal*verticeTotal; ++i)
@@ -334,6 +330,26 @@ function checkAdjMatrix()
         vertRow = 0;
     //}
     
+    ++matCol;
+    if(matCol == (verticeTotal*verticeTotal))
+    {
+      ++matRow;
+      matCol = matRow;
+	  
+	  for(var k = 0; k < matRow; ++k)
+	  {
+		  ++vertCol;
+		  if(vertCol == verticeTotal)
+		  {
+			++vertRow;
+			vertCol = 0;
+		  }
+		  
+		  if(vertRow == verticeTotal)
+			vertRow = 0;
+	  }
+    }
+	
     if((matCol == matRow) && (matRow != 0))
     {
       ++vertCol2;
@@ -345,13 +361,6 @@ function checkAdjMatrix()
       
       if(vertRow2 == verticeTotal)
         vertRow2 = 0;
-    }
-    
-    ++matCol;
-    if(matCol == (verticeTotal*verticeTotal))
-    {
-      ++matRow;
-      matCol = matRow;
     }
   }
 }
@@ -413,10 +422,22 @@ function drawAdjMatrix()
   }
 }
 
-function ToggleGrafoMatriz()
+function toggleGrafoMatriz()
 {
 	if(exibeGrafo)
 		exibeGrafo = false;
 	else
 		exibeGrafo = true;
+}
+
+function clearAll()
+{
+	var sqrVertice = verticeTotal*verticeTotal;
+	var matrixSize = sqrVertice*(sqrVertice+1)/2;
+	adjMatrix = [];
+	adjMatrix = new Array(matrixSize); //N(N+1)/2
+	for(var i = 0; i < matrixSize; ++i)
+		adjMatrix[i] = 0;
+	
+	clearSelection();
 }
