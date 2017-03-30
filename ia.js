@@ -275,9 +275,9 @@ function clearSelection()
 function fromMatrixToVector(i, j)
 {
    if (i <= j)
-      return i*verticeTotal+j;//return i * verticeTotal - (i - 1) * i / 2 + j - i;
+      return i * verticeTotal * verticeTotal - (i - 1) * i / 2 + j - i;
    else
-      return j*verticeTotal+i;//return j * verticeTotal - (j - 1) * j / 2 + i - j;
+      return j * verticeTotal * verticeTotal - (j - 1) * j / 2 + i - j;
 }
 
 function checkAdjMatrix()
@@ -381,7 +381,10 @@ function drawAdjMatrix()
   
   for(var i = 0; i < adjMatrix.length; ++i)
   {
-    context.strokeText(adjMatrix[i],45+matCol*20,40+matRow*20);
+	if(adjMatrix[i] == 2)
+		context.strokeText('√'+adjMatrix[i],45+matCol*20,40+matRow*20);
+	else
+		context.strokeText(adjMatrix[i],45+matCol*20,40+matRow*20);
     
     if(matRow == 0)
     {
