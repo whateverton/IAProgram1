@@ -25,7 +25,7 @@ var elemLeft,
 var selectedOne = -1;
 var selectedTwo = -1;
 
-
+var exibeGrafo = true;
 
 function Start()
 {
@@ -34,6 +34,8 @@ function Start()
 	
 	elemLeft = canvas.offsetLeft,
     elemTop = canvas.offsetTop,
+	
+	exibeGrafo = true;
 	
 	verticeImg = new Image();
 	verticeImg.src = "vertice.png";
@@ -119,24 +121,30 @@ function Draw()
 	context.font = '15px Arial';
 	context.fillStyle = 'black';
 	
-	for(var i = 0; i < MAX_VERT; ++i)
+	if(exibeGrafo)
 	{
-		for(var j = 0; j < MAX_VERT; ++j)
+		for(var i = 0; i < MAX_VERT; ++i)
 		{
-			if(vertice[i][j].visivel)
+			for(var j = 0; j < MAX_VERT; ++j)
 			{
-				if(!vertice[i][j].selected)
-					context.drawImage(verticeImg, vertice[i][j].pos_x, vertice[i][j].pos_y,GRAFO_SIZE,GRAFO_SIZE);
-				else
-					context.drawImage(verticeSelectedImg, vertice[i][j].pos_x, vertice[i][j].pos_y,GRAFO_SIZE,GRAFO_SIZE);
-				
-				context.strokeText('('+vertice[i][j].index_x +','+vertice[i][j].index_y+')',vertice[i][j].pos_x,vertice[i][j].pos_y);
+				if(vertice[i][j].visivel)
+				{
+					if(!vertice[i][j].selected)
+						context.drawImage(verticeImg, vertice[i][j].pos_x, vertice[i][j].pos_y,GRAFO_SIZE,GRAFO_SIZE);
+					else
+						context.drawImage(verticeSelectedImg, vertice[i][j].pos_x, vertice[i][j].pos_y,GRAFO_SIZE,GRAFO_SIZE);
+					
+					context.strokeText('('+vertice[i][j].index_x +','+vertice[i][j].index_y+')',vertice[i][j].pos_x,vertice[i][j].pos_y);
+				}
 			}
 		}
-	}
 	
-	checkAdjMatrix();
-  drawAdjMatrix();
+		checkAdjMatrix();
+	}
+	else
+	{
+		drawAdjMatrix();
+	}
 }
 
 function addElement()
@@ -304,12 +312,12 @@ function checkAdjMatrix()
   for(var i = 0; i < adjMatrix.length; ++i)
   {
     if(adjMatrix[i] != 0)
-		{
-				drawAresta(vertice[elements[col].index_i][elements[col].index_j].pos_x,
-                   vertice[elements[col].index_i][elements[col].index_j].pos_y,
-                   vertice[elements[row].index_i][elements[row].index_j].pos_x,
-                   vertice[elements[row].index_i][elements[row].index_j].pos_y,
-                   'black');
+	{
+		drawAresta(vertice[elements[col].index_i][elements[col].index_j].pos_x,
+				   vertice[elements[col].index_i][elements[col].index_j].pos_y,
+				   vertice[elements[row].index_i][elements[row].index_j].pos_x,
+				   vertice[elements[row].index_i][elements[row].index_j].pos_y,
+				   'black');
     }
     
     if(matRow == 0)
@@ -363,11 +371,11 @@ function drawAdjMatrix()
   
   for(var i = 0; i < adjMatrix.length; ++i)
   {
-    context.strokeText(adjMatrix[i],545+matCol*20,40+matRow*20);
+    context.strokeText(adjMatrix[i],45+matCol*20,40+matRow*20);
     
     if(matRow == 0)
     {
-      context.strokeText('('+vertCol+','+vertRow+')',540+matCol*20,20+matRow);
+      context.strokeText('('+vertCol+','+vertRow+')',40+matCol*20,20+matRow);
     
       ++vertCol;
       if(vertCol == verticeTotal)
@@ -382,7 +390,7 @@ function drawAdjMatrix()
     
     if(matCol == matRow)
     {
-      context.strokeText('('+vertCol2+','+vertRow2+')',510,40+matRow*20);
+      context.strokeText('('+vertCol2+','+vertRow2+')',10,40+matRow*20);
     
       ++vertCol2;
       if(vertCol2 == verticeTotal)
@@ -402,4 +410,12 @@ function drawAdjMatrix()
       matCol = matRow;
     }
   }
+}
+
+function ToggleGrafoMatriz()
+{
+	if(exibeGrafo)
+		exibeGrafo = false;
+	else
+		exibeGrafo = true;
 }

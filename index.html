@@ -4,11 +4,21 @@
 	</head>
 	
 	<body onload="Start()">
-		<button onclick="addElement()">+</button>
-		<button onclick="removeElement()">-</button>
+		<div>
+			<div>
+				<button onclick="ToggleGrafoMatriz()">Grafo/Matriz</button>
+			</div>
+			<div>
+				<button onclick="addElement()">+</button>
+				<button onclick="removeElement()">-</button>
+			</div>
+		</div>
 		
-		<canvas id="canvas" width="800" height="600">
-			Your browser is not compatible with HTML5!
-		</canvas>
+		<div>
+			<canvas id="canvas" width="800" height="800">
+				Your browser is not compatible with HTML5!
+			</canvas>
+		
+		</div>
 	</body>
 </html>
