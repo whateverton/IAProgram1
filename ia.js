@@ -10,6 +10,8 @@ var MIN_VERT = 2;
 var MAX_VERT = 6;
 
 var vertice;
+var path = [];
+var visited = [];
 var adjMatrix = [0,0,0,0,
 				   0,0,0,
 				     0,0,
@@ -26,6 +28,8 @@ var selectedOne = -1;
 var selectedTwo = -1;
 
 var exibeGrafo = true;
+var editGrafo = true;
+var hasPath = false;
 
 function Start()
 {
@@ -36,6 +40,8 @@ function Start()
     elemTop = canvas.offsetTop,
 	
 	exibeGrafo = true;
+  editGrafo = true;
+  hasPath = false;
 	
 	verticeImg = new Image();
 	verticeImg.src = "vertice.png";
@@ -102,21 +108,37 @@ function Update()
 {
 	if(selectedOne != -1 && selectedTwo != -1)
 	{
-		if((elements[selectedOne].index_i - elements[selectedTwo].index_i) == 1 || (elements[selectedOne].index_j - elements[selectedTwo].index_j) == 1||
-		   (elements[selectedOne].index_i - elements[selectedTwo].index_i) == -1 || (elements[selectedOne].index_j - elements[selectedTwo].index_j) == -1)
-		{
-			if(adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] != 0)
-				adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 0;
-			else
-			{
-				if((elements[selectedOne].index_i != elements[selectedTwo].index_i) && (elements[selectedOne].index_j != elements[selectedTwo].index_j))
-					adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 2;
-				else
-					adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 1;
-			}
-		}
-		
-		clearSelection();
+    if(editGrafo)
+    {
+      if((elements[selectedOne].index_i - elements[selectedTwo].index_i) == 1 || (elements[selectedOne].index_j - elements[selectedTwo].index_j) == 1 ||
+         (elements[selectedOne].index_i - elements[selectedTwo].index_i) == -1 || (elements[selectedOne].index_j - elements[selectedTwo].index_j) == -1)
+      {
+        if(adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] != 0)
+          adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 0;
+        else
+        {
+          if((elements[selectedOne].index_i != elements[selectedTwo].index_i) && (elements[selectedOne].index_j != elements[selectedTwo].index_j))
+            adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 2;
+          else
+            adjMatrix[fromMatrixToVector(selectedOne,selectedTwo)] = 1;
+        }
+      }
+    }
+    else
+    {
+      if(!checkPath(selectedOne,selectedTwo))
+      {
+        hasPath = false;
+        alert('Não há caminho');
+      }
+      else
+      {
+        hasPath = true;
+        alert('Caminho descoberto');
+      }
+    }
+    
+    clearSelection();
 	}
 }
 
@@ -126,8 +148,10 @@ function Draw()
 	context.fillStyle = 'rgb(255,255,255)';
 	context.fillRect(0,0,canvas.width,canvas.height);
 	
+	context.lineWidth=1;
 	context.font = '15px Arial';
 	context.fillStyle = 'black';
+	context.strokeStyle = 'black';
 	
 	if(exibeGrafo)
 	{
@@ -148,6 +172,11 @@ function Draw()
 		}
 	
 		checkAdjMatrix();
+    
+    if(hasPath)
+    {
+      drawInfo();
+    }
 	}
 	else
 	{
@@ -157,34 +186,40 @@ function Draw()
 
 function addElement()
 {
-	if(verticeTotal < MAX_VERT)
-	{
-		++verticeTotal;
-		reloadVisible();
-		
-		var sqrVertice = verticeTotal*verticeTotal;
-		var matrixSize = sqrVertice*(sqrVertice+1)/2;
-    adjMatrix = [];
-		adjMatrix = new Array(matrixSize); //N(N+1)/2
-		for(var i = 0; i < matrixSize; ++i)
-			adjMatrix[i] = 0;
-	}
+  if(editGrafo)
+  {
+    if(verticeTotal < MAX_VERT)
+    {
+      ++verticeTotal;
+      reloadVisible();
+      
+      var sqrVertice = verticeTotal*verticeTotal;
+      var matrixSize = sqrVertice*(sqrVertice+1)/2;
+      adjMatrix = [];
+      adjMatrix = new Array(matrixSize); //N(N+1)/2
+      for(var i = 0; i < matrixSize; ++i)
+        adjMatrix[i] = 0;
+    }
+  }
 }
 
 function removeElement()
 {
-	if(verticeTotal > MIN_VERT)
-	{
-		--verticeTotal;
-		reloadVisible();
-		
-		var sqrVertice = verticeTotal*verticeTotal;
-		var matrixSize = sqrVertice*(sqrVertice+1)/2;
-    adjMatrix = [];
-		adjMatrix = new Array(matrixSize); //N(N+1)/2
-		for(var i = 0; i < matrixSize; ++i)
-			adjMatrix[i] = 0;
-	}
+  if(editGrafo)
+  {
+    if(verticeTotal > MIN_VERT)
+    {
+      --verticeTotal;
+      reloadVisible();
+      
+      var sqrVertice = verticeTotal*verticeTotal;
+      var matrixSize = sqrVertice*(sqrVertice+1)/2;
+      adjMatrix = [];
+      adjMatrix = new Array(matrixSize); //N(N+1)/2
+      for(var i = 0; i < matrixSize; ++i)
+        adjMatrix[i] = 0;
+    }
+  }
 }
 
 function reloadVisible()
@@ -214,9 +249,11 @@ function reloadVisible()
 
 function drawAresta(ox, oy, dx, dy, color)
 {
+	context.strokeStyle = color;
+	context.lineWidth=2;
+  
 	context.beginPath();
 	context.moveTo(ox+GRAFO_SIZE/2,oy+GRAFO_SIZE/2);
-	context.fillStyle = color;
 	context.lineTo(dx+GRAFO_SIZE/2,dy+GRAFO_SIZE/2);
 	context.stroke();
 }
@@ -314,11 +351,17 @@ function checkAdjMatrix()
   {
     if(adjMatrix[i] != 0)
 	{
+    var color;
+    if((visited[vertCol+vertRow*verticeTotal] == true)&&(visited[vertCol+vertRow*verticeTotal] == true))
+      color = 'red';
+    else
+      color = 'black';
+      
 		drawAresta(vertice[vertCol][vertRow].pos_x,
 				   vertice[vertCol][vertRow].pos_y,
 				   vertice[vertCol2][vertRow2].pos_x,
 				   vertice[vertCol2][vertRow2].pos_y,
-				   'black');
+				   color);
     }
     
     //if(matRow == 0)
@@ -371,8 +414,10 @@ function checkAdjMatrix()
 
 function drawAdjMatrix()
 {
+	context.lineWidth=1;
   context.font = '8px Arial';
 	context.fillStyle = 'black';
+	context.strokeStyle = 'black';
   
   var matCol = 0; // x
   var matRow = 0; // y
@@ -437,14 +482,146 @@ function toggleGrafoMatriz()
 		exibeGrafo = true;
 }
 
+function closeGraph()
+{
+	if(editGrafo)
+  {
+		editGrafo = false;
+    alert('Selecione origem e destino');
+  }
+	else
+  {
+    visited = [];
+		editGrafo = true;
+  }
+  
+  hasPath = false;
+}
+
 function clearAll()
 {
-	var sqrVertice = verticeTotal*verticeTotal;
-	var matrixSize = sqrVertice*(sqrVertice+1)/2;
-	adjMatrix = [];
-	adjMatrix = new Array(matrixSize); //N(N+1)/2
-	for(var i = 0; i < matrixSize; ++i)
-		adjMatrix[i] = 0;
-	
+  if(editGrafo)
+  {
+    var sqrVertice = verticeTotal*verticeTotal;
+    var matrixSize = sqrVertice*(sqrVertice+1)/2;
+    adjMatrix = [];
+    adjMatrix = new Array(matrixSize); //N(N+1)/2
+    for(var i = 0; i < matrixSize; ++i)
+      adjMatrix[i] = 0;
+  }
+  
+  visited = [];
+	hasPath = false;
 	clearSelection();
+}
+
+function checkPath(current, goal) {
+  var stack = [];
+  var node;
+  var foundSome = false;
+  
+  path = [];
+  visited = [];
+  
+  stack.push(current);
+  path.push({parent: -1, me: current});
+  visited[current] = true;
+  
+  while (stack.length)
+  {
+    node = stack.pop();
+    
+    if (node == goal)
+    {
+      return true;
+    }
+
+    foundSome = false;
+    for (var i = 0; i < (verticeTotal*verticeTotal); ++i)
+    {
+      if (adjMatrix[fromMatrixToVector(node,i)] && !visited[i])
+      {
+        stack.push(i);
+        path.push({parent:node,me:i});
+        visited[i] = true;
+        foundSome = true;
+      }
+    }
+  }
+  
+  return false;
+}
+
+function drawInfo()
+{
+	context.lineWidth=1;
+	context.font = '15px Arial';
+	context.fillStyle = 'black';
+	context.strokeStyle = 'black';
+  
+  var destino = -1;
+  var origem = -1;
+  
+  var totalDist = 0;
+  var manhattanDist = 0;
+  
+  var vertCol = 0;
+  var vertRow = 0;
+  
+  context.strokeText('Caminho feito:',510,20);
+  
+  var currentParent = -2;
+  var textOffset = 0;
+
+  for(var i = path.length-1, textOffset = path.length-1; i >= 0; --i)
+  {
+    vertCol = 0;
+    vertRow = 0;
+    
+    if((currentParent != path[i].parent) || (path[i].parent == -1))
+    {
+      currentParent = path[i].parent;
+      --textOffset;
+
+      for(var j = 0; j < path[i].me; ++j)
+      {
+        ++vertCol;
+        if(vertCol == verticeTotal)
+        {
+          ++vertRow;
+          vertCol = 0;
+        }
+        
+        if(vertRow == verticeTotal)
+          vertRow = 0;
+      }
+      
+      if(destino == -1)
+        destino = [vertCol,vertRow];
+
+      context.strokeText('('+vertCol+','+vertRow+')',550,60+textOffset*20);
+      
+      if(path[i].parent != -1)
+        totalDist += Math.sqrt(adjMatrix[fromMatrixToVector(path[i].me,path[i].parent)]);
+    }
+  }
+  
+  origem = [vertCol,vertRow];
+  
+  manhattanDist = Math.abs(origem[0]-destino[0]) + Math.abs(origem[1]-destino[1]);
+  
+  context.strokeText('Distancia Manhattan:',20,520);
+  context.strokeText(manhattanDist,165,520);
+
+  context.strokeText('Distancia Total:',20,540);
+  context.strokeText(totalDist,165,540);
+}
+
+function remove(array, element)
+{
+    const index = array.indexOf(element);
+    
+    if (index !== -1) {
+        array.splice(index, 1);
+    }
 }
