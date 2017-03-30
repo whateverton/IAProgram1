@@ -323,21 +323,6 @@ function fromMatrixToVector(i, j)
 
 function checkAdjMatrix()
 {
-	/*for(var i = 0; i < verticeTotal*verticeTotal; ++i)
-	{
-		for(var j = 0; j < verticeTotal*verticeTotal; ++j)
-		{
-			if(adjMatrix[fromMatrixToVector(i,j)] != 0)
-			{
-				drawAresta(vertice[elements[i].index_i][elements[i].index_j].pos_x,
-						   vertice[elements[i].index_i][elements[i].index_j].pos_y,
-						   vertice[elements[j].index_i][elements[j].index_j].pos_x,
-						   vertice[elements[j].index_i][elements[j].index_j].pos_y,
-						   'black');
-			}
-		}
-	}
-  */ 
   var matCol = 0; // x
   var matRow = 0; // y
   
@@ -615,6 +600,8 @@ function drawInfo()
 
   context.strokeText('Distancia Total:',20,540);
   context.strokeText(totalDist,165,540);
+  
+  context.strokeText('Busca em Profundidade',20,500);
 }
 
 function remove(array, element)
