@@ -31,6 +31,11 @@ var exibeGrafo = true;
 var editGrafo = true;
 var hasPath = false;
 
+var bt1;
+var bt2;
+var bt4;
+var bt5;
+
 function Start()
 {
 	canvas = document.getElementById("canvas");
@@ -38,6 +43,11 @@ function Start()
 	
 	elemLeft = canvas.offsetLeft,
     elemTop = canvas.offsetTop,
+	
+	bt1 = document.getElementById('myButton1');
+	bt2 = document.getElementById('myButton2');
+	bt4 = document.getElementById('myButton4');
+	bt5 = document.getElementById('myButton5');
 	
 	exibeGrafo = true;
   editGrafo = true;
@@ -154,7 +164,7 @@ function Draw()
 	context.strokeStyle = 'black';
 	
 	if(exibeGrafo)
-	{
+	{		
 		for(var i = 0; i < MAX_VERT; ++i)
 		{
 			for(var j = 0; j < MAX_VERT; ++j)
@@ -173,10 +183,19 @@ function Draw()
 	
 		checkAdjMatrix();
     
-    if(hasPath)
-    {
-      drawInfo();
-    }
+		if(hasPath)
+		{
+		  drawInfo();
+		}
+		else
+		{
+			context.lineWidth=1;
+
+			if(editGrafo)
+				context.strokeText('Modo de Edição',20,500);
+			else
+				context.strokeText('Escolha Origem e Destino',20,500);
+		}
 	}
 	else
 	{
@@ -462,9 +481,15 @@ function drawAdjMatrix()
 function toggleGrafoMatriz()
 {
 	if(exibeGrafo)
+	{
 		exibeGrafo = false;
+		bt2.value = 'Exibe Grafo';
+	}
 	else
+	{
 		exibeGrafo = true;
+		bt2.value = 'Exibe Matriz';
+	}
 }
 
 function closeGraph()
@@ -472,12 +497,17 @@ function closeGraph()
 	if(editGrafo)
   {
 		editGrafo = false;
-    alert('Selecione origem e destino');
+		bt1.value = 'Editar Grafo';
+		bt4.disabled = true;
+		bt5.disabled = true;
   }
 	else
   {
     visited = [];
 		editGrafo = true;
+		bt1.value = 'Salvar Grafo';
+		bt4.disabled = false;
+		bt5.disabled = false;
   }
   
   hasPath = false;
